@@ -8,7 +8,7 @@
       <h2 class="text-2xl font-bold m-2">Latest messages</h2>
       <div
         class="flex p-2 items-center"
-        v-for="message in messages"
+        v-for="message in discordMessages"
         :key="message.id"
       >
         <span class="mr-2 text-sm text-gray-500">{{
@@ -34,7 +34,6 @@
         <h3 class="text-xl font-semibold">Output:</h3>
         <div class="text-left">
           <pre>{{ output }}</pre>
-          <pre>{{ immediateOutput }}</pre>
         </div>
       </div>
     </div>
@@ -44,47 +43,30 @@
 <script>
 import saferEval from 'safer-eval';
 import { reactive, computed, watchEffect } from 'vue';
+import { useDiscordClient } from "../compositions/useDiscordClient"
 
-// create new discord client
-const client = new Discord.Client();
-client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-});
 
 export default {
   name: 'Dashboard',
   setup() {
-    const messages = [];
-    const code = reactive('');
-    const output = '';
-    const immediateOutput = '';
 
-    return { messages, code, output, immediateOutput };
-  },
-  mounted() {
-    // get token from localstorage
+    // discord setup
     const token = localStorage.getItem('token');
-    client.on('message', (msg) => {
-      if (msg.content.length > 0) {
-        this.messages.push(msg);
-      }
-    });
-    client.login(token);
+    const { messages: discordMessages } = useDiscordClient(token)
 
-    watchEffect(() => {
+    // code setup
+    const code = ref('');
+    const output = ref('');
+    computed(() => {
       try {
-        const res = saferEval(this.code, { client });
-        this.immediateOutput = JSON.stringify(res, null, 2);
+        const res = saferEval(code.value, { client });
+        this.output.value = JSON.stringify(res, null, 2);
       } catch (err) {
-        this.immediateOutput = JSON.stringify(err, null, 2);
+        this.output.value = JSON.stringify(err, null, 2);
       }
     });
-  },
-  methods: {
-    executeCode() {
-      const res = saferEval(this.code, { client });
-      this.output = JSON.stringify(res, null, 2);
-    },
+
+    return { discordMessages, code, output };
   },
 };
 </script>
