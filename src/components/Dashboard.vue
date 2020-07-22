@@ -26,11 +26,15 @@
       <button
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
-        @click="executeCode"
+        @click="updateOutput"
       >
         Execute
       </button>
       <div class="flex flex-col">
+        <h3 class="text-xl font-semibold">Immediate Output:</h3>
+        <div class="text-left">
+          <pre>{{ immediateOutput }}</pre>
+        </div>
         <h3 class="text-xl font-semibold">Output:</h3>
         <div class="text-left">
           <pre>{{ output }}</pre>
@@ -42,7 +46,7 @@
 
 <script>
 import saferEval from 'safer-eval';
-import { ref, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useDiscordClient } from "../compositions/useDiscordClient"
 
 
@@ -57,19 +61,24 @@ export default {
     // code setup
     const code = ref('');
 
-    // output setup
-    const output = ref('');
-
-    function executeCode() {
+    function executeCode(code) {
       try {
-        const res = saferEval(code.value, { client });
-        output.value = (JSON.stringify(res, null, 2));
+        const res = saferEval(code, { client });
+        return JSON.stringify(res, null, 2);
       } catch (err) {
-        output.value = (`ERROR:  ${JSON.stringify(err, null, 2)}`);
+        return `ERROR:  ${JSON.stringify(err, null, 2)}`;
       }
     }
 
-    return { discordMessages, client, code, output, executeCode };
+    // output setup
+    const output = ref('');
+    const immediateOutput = computed(() => executeCode(code.value))
+
+    function updateOutput(value) {
+      output.value = executeCode(code.value)
+    }
+
+    return { discordMessages, client, code, output, updateOutput, immediateOutput };
   },
 };
 </script>
