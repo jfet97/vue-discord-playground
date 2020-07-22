@@ -26,7 +26,7 @@
       <button
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
-        @click="updateOutput"
+        @click="onExecuteClick"
       >
         Execute
       </button>
@@ -61,9 +61,9 @@ export default {
     // code setup
     const code = ref('');
 
-    function executeCode(code) {
+    function evalCode(codeValue) {
       try {
-        const res = saferEval(code, { client });
+        const res = saferEval(codeValue, { client });
         return JSON.stringify(res, null, 2);
       } catch (err) {
         return `ERROR:  ${JSON.stringify(err, null, 2)}`;
@@ -72,13 +72,18 @@ export default {
 
     // output setup
     const output = ref('');
-    const immediateOutput = computed(() => executeCode(code.value))
 
     function updateOutput(value) {
-      output.value = executeCode(code.value)
+      output.value = value
     }
 
-    return { discordMessages, client, code, output, updateOutput, immediateOutput };
+    const immediateOutput = computed(() => evalCode(code.value))
+
+    function onExecuteClick() {
+      updateOutput(evalCode(code.value))
+    }
+
+    return { discordMessages, client, code, output, immediateOutput, onExecuteClick };
   },
 };
 </script>
