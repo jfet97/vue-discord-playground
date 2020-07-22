@@ -14,7 +14,7 @@ export function useDiscordClient(token) {
 
   client.on('message', (msg) => {
     if (msg.content.length > 0) {
-      this.messages.value.push(msg);
+      messages.value.push(msg);
     }
   });
 
@@ -22,7 +22,8 @@ export function useDiscordClient(token) {
 
   return (
     {
-      messages
+      messages,
+      client
     }
   )
 }

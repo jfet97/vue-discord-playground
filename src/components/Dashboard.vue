@@ -26,7 +26,7 @@
       <button
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
         type="button"
-        v-on:click="executeCode"
+        @click="executeCode"
       >
         Execute
       </button>
@@ -42,7 +42,7 @@
 
 <script>
 import saferEval from 'safer-eval';
-import { reactive, computed, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import { useDiscordClient } from "../compositions/useDiscordClient"
 
 
@@ -52,21 +52,24 @@ export default {
 
     // discord setup
     const token = localStorage.getItem('token');
-    const { messages: discordMessages } = useDiscordClient(token)
+    const { messages: discordMessages, client } = useDiscordClient(token)
 
     // code setup
     const code = ref('');
+
+    // output setup
     const output = ref('');
-    computed(() => {
+
+    function executeCode() {
       try {
         const res = saferEval(code.value, { client });
-        this.output.value = JSON.stringify(res, null, 2);
+        output.value = (JSON.stringify(res, null, 2));
       } catch (err) {
-        this.output.value = JSON.stringify(err, null, 2);
+        output.value = (`ERROR:  ${JSON.stringify(err, null, 2)}`);
       }
-    });
+    }
 
-    return { discordMessages, code, output };
+    return { discordMessages, client, code, output, executeCode };
   },
 };
 </script>
