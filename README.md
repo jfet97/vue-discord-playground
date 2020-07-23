@@ -11,6 +11,7 @@ This is a small demo showing how to build a basic UI for browser-based Discord b
 ## Related links
 
 - [Vue 3.0](https://v3.vuejs.org/)
+- [Composiiton API](https://composition-api.vuejs.org/)
 - [Discord.js](https://discord.js.org/)
 
 ## Useful links
