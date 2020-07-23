@@ -65,13 +65,13 @@ export default {
     const outputRef = ref('');
     const immediateOutputRef = evaluatedCodeRef
 
-    function updateOutput(value) {
+    function updateOutputRef(value) {
       outputRef.value = value
     }
 
     // execution stuff
     function onExecuteClick() {
-      updateOutput(evaluatedCodeRef.value)
+      updateOutputRef(evaluatedCodeRef.value)
     }
 
     return { discordMessagesRef, codeRef, outputRef, immediateOutputRef, onExecuteClick };
