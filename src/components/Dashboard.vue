@@ -45,10 +45,9 @@
 </template>
 
 <script>
-import saferEval from 'safer-eval';
 import { ref, watch, computed } from 'vue';
 import { useDiscordClient } from "../compositions/useDiscordClient"
-
+import { useSaferEval } from "../compositions/useSaferEval"
 
 export default {
   name: 'Dashboard',
@@ -60,27 +59,19 @@ export default {
 
     // code setup
     const code = ref('');
-
-    function evalCode(codeValue) {
-      try {
-        const res = saferEval(codeValue, { client });
-        return JSON.stringify(res, null, 2);
-      } catch (err) {
-        return `ERROR:  ${JSON.stringify(err, null, 2)}`;
-      }
-    }
+    const { evaluatedCode } = useSaferEval(code, { client }) // codeRef, environment
 
     // output setup
     const output = ref('');
+    const immediateOutput = evaluatedCode
 
     function updateOutput(value) {
       output.value = value
     }
 
-    const immediateOutput = computed(() => evalCode(code.value))
-
+    // execution stuff
     function onExecuteClick() {
-      updateOutput(evalCode(code.value))
+      updateOutput(evaluatedCode)
     }
 
     return { discordMessages, client, code, output, immediateOutput, onExecuteClick };
