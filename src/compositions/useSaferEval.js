@@ -1,22 +1,21 @@
 import saferEval from 'safer-eval';
 import { computed } from 'vue';
 
-const makeEvalCode = (env) => (codeValue) => {
+const makeEvalCode = (env) => (code) => {
     try {
-        const res = saferEval(codeValue, env);
+        const res = saferEval(code, env);
         return JSON.stringify(res, null, 2);
     } catch (err) {
-        return `ERROR:  ${JSON.stringify(err, null, 2)}`;
+        return `ERROR: ${err}`;
     }
 }
-
 
 export function useSaferEval(codeRef, env) {
 
     const evalCode = makeEvalCode(env)
 
-    const evaluatedCode = computed(() => evalCode(codeRef.value))
+    const evaluatedCodeRef = computed(() => evalCode(codeRef.value))
 
-    return { evalCode, evaluatedCode }
+    return { evalCode, evaluatedCodeRef }
 
 }

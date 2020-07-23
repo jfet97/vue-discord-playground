@@ -3,27 +3,27 @@ import { ref } from "vue"
 export function useDiscordClient(token) {
 
   // create new discord client
-  const client = new Discord.Client();
+  const discordClient = new Discord.Client();
 
   // all the messages
-  const messages = ref([]);
+  const discordMessagesRef = ref([]);
 
-  client.on('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+  discordClient.on('ready', () => {
+    console.log(`Logged in as ${discordClient.user.tag}!`);
   });
 
-  client.on('message', (msg) => {
+  discordClient.on('message', (msg) => {
     if (msg.content.length > 0) {
-      messages.value.push(msg);
+      discordMessagesRef.value.push(msg);
     }
   });
 
-  client.login(token);
+  discordClient.login(token);
 
   return (
     {
-      messages,
-      client
+      discordMessagesRef,
+      discordClient
     }
   )
 }

@@ -8,7 +8,7 @@
       <h2 class="text-2xl font-bold m-2">Latest messages</h2>
       <div
         class="flex p-2 items-center"
-        v-for="message in discordMessages"
+        v-for="message in discordMessagesRef"
         :key="message.id"
       >
         <span class="mr-2 text-sm text-gray-500">{{
@@ -21,7 +21,7 @@
       <textarea
         class="appearance-none block w-full text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
         placeholder="Code"
-        v-model="code"
+        v-model="codeRef"
       ></textarea>
       <button
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -33,11 +33,11 @@
       <div class="flex flex-col">
         <h3 class="text-xl font-semibold">Immediate Output:</h3>
         <div class="text-left">
-          <pre>{{ immediateOutput }}</pre>
+          <pre>{{ immediateOutputRef }}</pre>
         </div>
         <h3 class="text-xl font-semibold">Output:</h3>
         <div class="text-left">
-          <pre>{{ output }}</pre>
+          <pre>{{ outputRef }}</pre>
         </div>
       </div>
     </div>
@@ -55,26 +55,26 @@ export default {
 
     // discord setup
     const token = localStorage.getItem('token');
-    const { messages: discordMessages, client } = useDiscordClient(token)
+    const { discordMessagesRef, discordClient } = useDiscordClient(token)
 
     // code setup
-    const code = ref('');
-    const { evaluatedCode } = useSaferEval(code, { client }) // codeRef, environment
+    const codeRef = ref('');
+    const { evaluatedCodeRef } = useSaferEval(codeRef, { client: discordClient })
 
     // output setup
-    const output = ref('');
-    const immediateOutput = evaluatedCode
+    const outputRef = ref('');
+    const immediateOutputRef = evaluatedCodeRef
 
     function updateOutput(value) {
-      output.value = value
+      outputRef.value = value
     }
 
     // execution stuff
     function onExecuteClick() {
-      updateOutput(evaluatedCode)
+      updateOutput(evaluatedCodeRef.value)
     }
 
-    return { discordMessages, client, code, output, immediateOutput, onExecuteClick };
+    return { discordMessagesRef, codeRef, outputRef, immediateOutputRef, onExecuteClick };
   },
 };
 </script>
